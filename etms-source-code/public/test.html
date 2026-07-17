@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head></head>
+<body>
+    <div class="user-avatar" id="userAvatar">A</div>
+    <script>
+        const user = { fullName: 'Test User', avatarUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=' };
+        const avatarEl = document.getElementById('userAvatar');
+        if (avatarEl) {
+            if (user.avatarUrl) {
+                avatarEl.innerHTML = `<img src="${user.avatarUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+            } else {
+                avatarEl.textContent = (user.fullName || 'U')[0].toUpperCase();
+            }
+        }
+        console.log("Result:", avatarEl.outerHTML);
+    </script>
+</body>
+</html>
