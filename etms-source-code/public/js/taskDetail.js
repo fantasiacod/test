@@ -146,7 +146,7 @@ const TaskDetail = {
     },
     async approveStatus(action) {
         let extraDays = 0;
-        if (action === 'approve' && this.task.status === 'pending_delay') {
+        if (action === 'approve' && (this.task.status === 'pending_delay' || this.task.status === 'delayed')) {
             const {value} = await Swal.fire({
                 title: 'تأكيد الموافقة',
                 text: 'هل ترغب في إضافة أيام إضافية للمهمة لتمديد فترة الإنجاز؟',
