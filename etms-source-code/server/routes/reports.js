@@ -65,6 +65,7 @@ router.get('/employees', authorize('view_reports', 'view_tasks'), async (req, re
             .eq('status', 'active');
 
         if (req.departmentScope) userQuery = userQuery.eq('department_id', req.departmentScope);
+        if (req.query.assigned_to) userQuery = userQuery.eq('id', req.query.assigned_to);
 
         const { data: users, error: ue } = await userQuery;
         if (ue) throw ue;

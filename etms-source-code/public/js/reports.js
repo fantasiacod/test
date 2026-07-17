@@ -13,10 +13,18 @@ const Reports = {
             });
         });
         
-        if(App.isAdmin()) { 
+        if(App.isAdmin() || App.isSuperUser()) { 
             try { 
                 const r = await API.get('/departments'); 
                 (r.data||[]).forEach(d => document.getElementById('rFilterDept')?.insertAdjacentHTML('beforeend',`<option value="${d.id}">${d.name}</option>`)); 
+                
+                // Fetch users for Employee filter
+                const u = await API.get('/users');
+                (u.data||[]).forEach(user => {
+                    if (user.role === 'employee' || user.role === 'manager') {
+                        document.getElementById('rFilterEmployee')?.insertAdjacentHTML('beforeend',`<option value="${user.id}">${user.full_name || user.username}</option>`);
+                    }
+                });
             } catch{} 
         }
     },
@@ -25,6 +33,7 @@ const Reports = {
         const df=document.getElementById('rFilterDateFrom')?.value; if(df)filters.date_from=df;
         const dt=document.getElementById('rFilterDateTo')?.value; if(dt)filters.date_to=dt;
         const dept=document.getElementById('rFilterDept')?.value; if(dept)filters.department_id=dept;
+        const emp=document.getElementById('rFilterEmployee')?.value; if(emp)filters.assigned_to=emp;
         const st=document.getElementById('rFilterStatus')?.value; if(st)filters.status=st;
         const pr=document.getElementById('rFilterPriority')?.value; if(pr)filters.priority=pr;
         try { 
