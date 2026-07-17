@@ -105,9 +105,11 @@ const TaskDetail = {
 
         // Manager Approval Buttons for Pending Requests or Justified Delayed Tasks
         const needsManagerApproval = t.status === 'pending_suspension' || t.status === 'pending_delay' || (t.status === 'delayed' && t.delayReason);
-        if ((role === 'manager' || role === 'admin') && needsManagerApproval) {
+        const isManagement = ['manager', 'admin', 'super_user'].includes(role);
+        
+        if (isManagement && needsManagerApproval) {
             html += `<hr class="my-2">`;
-            html += `<p class="small text-muted mb-2 text-center fw-bold">بانتظار موافقة المدير على التبرير</p>`;
+            html += `<p class="small text-muted mb-2 text-center fw-bold">بانتظار موافقة الإدارة على التبرير</p>`;
             html += `<button class="btn btn-success w-100 mb-2" onclick="TaskDetail.approveStatus('approve')"><i class="fas fa-check-circle me-1"></i>موافقة على الطلب</button>`;
             html += `<button class="btn btn-danger w-100 mb-2" onclick="TaskDetail.approveStatus('reject')"><i class="fas fa-times-circle me-1"></i>رفض الطلب</button>`;
         } else if (needsManagerApproval) {
@@ -117,7 +119,7 @@ const TaskDetail = {
         }
 
         // --- Admin Override Actions ---
-        if (role === 'admin' || role === 'manager') {
+        if (['admin', 'super_user'].includes(role)) {
             html += `<hr class="my-3">`;
             html += `<p class="small text-muted mb-2 text-center fw-bold"><i class="fas fa-shield-alt text-primary me-1"></i> صلاحيات الإدارة</p>`;
             if (t.status !== 'completed') {
@@ -128,7 +130,7 @@ const TaskDetail = {
             }
         }
 
-        if (role==='manager'||role==='admin') { html += `<button class="btn btn-gold w-100 mb-2" onclick="window.location.href='/tasks'"><i class="fas fa-arrow-left me-1"></i>العودة للمهام</button>`; }
+        if (isManagement) { html += `<button class="btn btn-gold w-100 mb-2" onclick="window.location.href='/tasks'"><i class="fas fa-arrow-left me-1"></i>العودة للمهام</button>`; }
         if (!html) html = '<p class="text-muted small">لا توجد إجراءات متاحة لهذه الحالة.</p>';
         el.innerHTML = html;
     },
