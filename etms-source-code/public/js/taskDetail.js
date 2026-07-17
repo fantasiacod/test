@@ -44,7 +44,21 @@ const TaskDetail = {
         
         document.getElementById('detailProgressText').textContent = p+'%';
         if (t.suspendReason) { document.getElementById('suspendReasonSection').style.display='block'; document.getElementById('detailSuspendReason').textContent=t.suspendReason; }
-        if (t.delayReason) { document.getElementById('delayReasonSection').style.display='block'; document.getElementById('detailDelayReason').textContent=t.delayReason; }
+        
+        // Show Justification Status
+        if (t.status === 'delayed' || t.status === 'pending_delay') {
+            document.getElementById('hasJustificationSection').style.display='block';
+            const badge = document.getElementById('detailHasJustification');
+            if (t.delayReason) {
+                badge.className = 'badge bg-success';
+                badge.textContent = 'نعم، تم الرفع';
+                document.getElementById('delayReasonSection').style.display='block';
+                document.getElementById('detailDelayReason').textContent=t.delayReason;
+            } else {
+                badge.className = 'badge bg-danger';
+                badge.textContent = 'لا، الموظف لم يبرر بعد';
+            }
+        }
     },
     renderNotes(notes) {
         const el = document.getElementById('notesTimeline');
@@ -93,13 +107,25 @@ const TaskDetail = {
         const needsManagerApproval = t.status === 'pending_suspension' || t.status === 'pending_delay' || (t.status === 'delayed' && t.delayReason);
         if ((role === 'manager' || role === 'admin') && needsManagerApproval) {
             html += `<hr class="my-2">`;
-            html += `<p class="small text-muted mb-2 text-center fw-bold">بانتظار موافقة المدير</p>`;
+            html += `<p class="small text-muted mb-2 text-center fw-bold">بانتظار موافقة المدير على التبرير</p>`;
             html += `<button class="btn btn-success w-100 mb-2" onclick="TaskDetail.approveStatus('approve')"><i class="fas fa-check-circle me-1"></i>موافقة على الطلب</button>`;
             html += `<button class="btn btn-danger w-100 mb-2" onclick="TaskDetail.approveStatus('reject')"><i class="fas fa-times-circle me-1"></i>رفض الطلب</button>`;
         } else if (needsManagerApproval) {
             // Show employee that it's waiting for approval
             html += `<hr class="my-2">`;
             html += `<div class="alert alert-info py-2 small text-center"><i class="fas fa-hourglass-half me-1"></i> بانتظار موافقة المدير على التبرير/الطلب</div>`;
+        }
+
+        // --- Admin Override Actions ---
+        if (role === 'admin' || role === 'manager') {
+            html += `<hr class="my-3">`;
+            html += `<p class="small text-muted mb-2 text-center fw-bold"><i class="fas fa-shield-alt text-primary me-1"></i> صلاحيات الإدارة</p>`;
+            if (t.status !== 'completed') {
+                html += `<button class="btn btn-outline-success w-100 mb-2" onclick="TaskDetail.changeStatus('completed')"><i class="fas fa-check-double me-1"></i>إقفال المهمة قسرياً</button>`;
+            }
+            if (t.status === 'delayed' || t.status === 'pending_delay') {
+                html += `<button class="btn btn-outline-primary w-100 mb-2" onclick="TaskDetail.approveStatus('approve')"><i class="fas fa-calendar-plus me-1"></i>تحديث المهمة وتمديد الوقت</button>`;
+            }
         }
 
         if (role==='manager'||role==='admin') { html += `<button class="btn btn-gold w-100 mb-2" onclick="window.location.href='/tasks'"><i class="fas fa-arrow-left me-1"></i>العودة للمهام</button>`; }
